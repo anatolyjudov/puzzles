@@ -1,5 +1,17 @@
-package main
+/*
 
+ Simple simulation of the game of life from recent interview.
+ Rules are implemented in doStep() in a switch block.
+
+ Each step we analyze only the positions surrounding live dots. All other dots won't become live according to the rules.
+ We sum up the effect from all living dots to their neighbouring positions in the temporary map (map[[2]int]Affect).
+ Affect is a special structure for counting all effects and storing the current state of the dot at this position.
+ After looping over all neighbours of live dots, we analyze the temporary map and apply rules to all affected positions,
+ creating the result of the step.
+
+*/
+
+package main
 import (
     "fmt"
 )
@@ -9,7 +21,8 @@ type Affect struct {
     live bool
 }
 
-//
+// entrypoint
+// input data defined here
 func main() {
 
     var coordinates = []int{0, 0, 0, 1, 1, 0, 1, 1, -1, -1}
@@ -19,15 +32,7 @@ func main() {
 
 }
 
-/*
-
- Each step we analyze only the positions surrounding live dots. All other dots won't become live according to the rules.
- We sum up the effect from all living dots to their neighbouring positions in the temporary map (map[[2]int]Affect).
- Affect is a special structure for counting all effects and storing the current state of the dot at this position.
- After looping over all neighbours of live dots, we analyze the temporary map and apply rules to all affected positions,
- creating the result of the step.
-
-*/
+// Implements steps loop only
 func solution (coordinates []int, steps int) []int {
 
     // steps loop
@@ -39,6 +44,7 @@ func solution (coordinates []int, steps int) []int {
     return coordinates
 }
 
+// Creates new affects map, call addAffects for each live dot, applies game rules
 func doStep (coordinates []int) (result []int) {
 
     var affects map[[2]int]Affect
@@ -66,9 +72,13 @@ func doStep (coordinates []int) (result []int) {
     return
 }
 
+// Top up effects counter for surrounding dots
 func addAffects(x, y int, affects map[[2]int]Affect) {
     for xd := -1; xd <= 1; xd++ {
         for yd := -1; yd <= 1; yd++ {
+            if xd == 0 && yd == 0 {
+                continue;
+            }
             coord := [2]int{x + xd, y + yd}
             if affect, ok := affects[coord]; ok {
                 affect.count++
@@ -83,6 +93,7 @@ func addAffects(x, y int, affects map[[2]int]Affect) {
     }
 }
 
+// Useful visualization for the small 11x11 square
 func printDots(res []int) {
     var size = 11
     var dots []bool
